@@ -1,0 +1,22 @@
+<monitor>
+	<name>ElasticSearchQueryMonitor</name>
+	<type>managed</type>
+	<description>Monitors Elastic Search Queries</description>
+	<monitor-configuration></monitor-configuration>
+	<monitor-run-task>
+	    <type>java</type>
+		<execution-style>periodic</execution-style>
+		<name>Elastic Search Query Monitor Task</name>
+        <display-name>Elastic Search Query Monitor Task</display-name>
+        <description>Elastic Search Query Monitor Task</description>
+		<execution-frequency-in-seconds>60</execution-frequency-in-seconds>
+		<execution-timeout-in-secs>60</execution-timeout-in-secs>
+		<task-arguments>
+			<argument name="config-file" is-required="true" default-value="monitors/ElasticSearchQueryMonitor/config.yml" />
+		</task-arguments>
+		<java-task>
+		      <classpath>elasticsearch-query-monitoring-extension.jar</classpath>
+		          <impl-class>com.appdynamics.extensions.elasticsearch.ElasticSearchQueryMonitor</impl-class>
+		</java-task>
+	</monitor-run-task>
+</monitor>

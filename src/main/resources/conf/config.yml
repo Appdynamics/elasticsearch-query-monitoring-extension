@@ -1,0 +1,35 @@
+# Elastic Search particulars
+host: localhost
+port: 9200
+username: 
+password: 
+usessl: false
+
+# number of concurrent tasks
+numberOfThreads: 5
+
+metricPrefix: "Custom Metrics|Elastic Search|"
+
+
+# Elastic Search Queries: queryDisplayName and metricDisplayName are the names appended in AppD Metric Browser
+# index: is the Elastic Search index that the request is queried upon
+# query: the actual query enclosed in single quote OR with escape characters
+# jsonPathInResponse: the path to the datapoint in the JSON response separated by ">"
+
+elasticSearchRequests:
+   - queryDisplayName: my_river
+     index: my_river
+     query: '{ "query":{"match_all":{}}}'
+     metrics:
+        - jsonPathInResponse: hits>total
+          metricDisplayName: my_river_total
+        - jsonPathInResponse: facets>terms>terms
+          metricDisplayName: facets
+   - queryDisplayName: index2
+     index: index2
+     query: '{ "query":{"match_all":{}}}'
+     metrics:
+        - jsonPathInResponse: hits>total
+          metricDisplayName: index2_total
+               
+   
