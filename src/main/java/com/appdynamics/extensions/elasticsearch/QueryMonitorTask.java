@@ -19,6 +19,7 @@ package com.appdynamics.extensions.elasticsearch;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
@@ -35,8 +36,6 @@ import com.google.common.collect.Maps;
 
 public class QueryMonitorTask implements Callable<QueryMetrics> {
 
-	private static final String JSON_ARRAY_FIELD_COUNT = "count";
-	private static final String JSON_ARRAY_FIELD_TERM = "term";
 	private SimpleHttpClient httpClient;
 	private ElasticSearchRequest esRequest;
 	private static final String SEARCH_JSON_URI = "_search?pretty";
@@ -50,51 +49,75 @@ public class QueryMonitorTask implements Callable<QueryMetrics> {
 
 	public QueryMetrics call() throws Exception {
 		QueryMetrics queryMetrics = new QueryMetrics();
-		Map<String, String> metrics = fetchMetrics();
+		Map<String, Double> metrics = fetchMetrics();
 		queryMetrics.setMetrics(metrics);
 		return queryMetrics;
 	}
 
-	private Map<String, String> fetchMetrics() {
-		Map<String, String> processedMetrics = Maps.newHashMap();
+	private Map<String, Double> fetchMetrics() {
+		Map<String, Double> processedMetrics = Maps.newHashMap();
 		try {
 			String responseString = getJsonResponseString(httpClient, esRequest.getIndex(), esRequest.getQuery());
 
 			processedMetrics = processResponeForMetrics(responseString, esRequest);
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			logger.error("Exception while processing query " + esRequest.getQuery(), e);
 		}
 		return processedMetrics;
 	}
 
-	private Map<String, String> processResponeForMetrics(String responseString, ElasticSearchRequest esRequest) throws JsonParseException,
+	private Map<String, Double> processResponeForMetrics(String responseString, ElasticSearchRequest esRequest) throws JsonParseException,
 			JsonMappingException, IOException {
-		Map<String, String> queryMetrics = Maps.newHashMap();
-		for (Metric metric : esRequest.getMetrics()) {
-			String[] paths = metric.getJsonPathInResponse().trim().split(">");
-			JsonNode jsonNode = new ObjectMapper().readValue(responseString.getBytes(), JsonNode.class);
-			for (int i = 0; i < paths.length; i++) {
-				jsonNode = jsonNode.path(paths[i].trim());
-			}
-			if(jsonNode.isNumber()) {
-				String metricValue = jsonNode.asText();
-				String metricName = esRequest.getQueryDisplayName() + METRIC_SEPARATOR + metric.getMetricDisplayName();
-				queryMetrics.put(metricName, metricValue);
-			} else if(jsonNode.isArray()) {
-				Iterator<JsonNode> elements = jsonNode.elements();
-				while (elements.hasNext()) {
-					JsonNode elementNode = elements.next();
-					if(elementNode.get(JSON_ARRAY_FIELD_TERM) != null) {
-						String termName = elementNode.get(JSON_ARRAY_FIELD_TERM).asText();
-						String metricValue = elementNode.get(JSON_ARRAY_FIELD_COUNT).asText();
-						String metricName = esRequest.getQueryDisplayName() + METRIC_SEPARATOR + metric.getMetricDisplayName() + METRIC_SEPARATOR + termName;
+		Map<String, Double> queryMetrics = Maps.newHashMap();
+		if(esRequest.getQueryDisplayName() != null) {
+			String queryName = esRequest.getQueryDisplayName();
+			for (Metric metric : esRequest.getMetrics()) {
+				if(metric.getJsonPathInResponse() != null) {
+					String[] paths = metric.getJsonPathInResponse().trim().split(">");
+					JsonNode jsonNode = new ObjectMapper().readValue(responseString.getBytes(), JsonNode.class);
+					for (int i = 0; i < paths.length; i++) {
+						jsonNode = jsonNode.path(paths[i].trim());
+					}
+					if (jsonNode.isNumber()) {
+						Double metricValue = jsonNode.asDouble();
+						StringBuilder sb = new StringBuilder(queryName).append(METRIC_SEPARATOR).append(buildMetricDisplayName(metric));
+						String metricName = sb.toString();
 						queryMetrics.put(metricName, metricValue);
+					} else if (jsonNode.isArray()) {
+						int i = 0;
+						Iterator<JsonNode> elements = jsonNode.elements();
+						while (elements.hasNext()) {
+							JsonNode elementNode = elements.next();
+							Iterator<Entry<String, JsonNode>> fields = elementNode.fields();
+							while (fields.hasNext()) {
+								Entry<String, JsonNode> entry = fields.next();
+								if (entry.getValue().isNumber()) {
+									StringBuilder sb = new StringBuilder(queryName).append(METRIC_SEPARATOR).append(
+											buildMetricDisplayName(metric));
+									String metricName = sb.append(METRIC_SEPARATOR).toString() + i + METRIC_SEPARATOR + entry.getKey();
+									Double metricValue = entry.getValue().asDouble();
+									queryMetrics.put(metricName, metricValue);
+								}
+							}
+							i++;
+						}
 					}
 				}
 			}
+		} else {
+			logger.error("queryDisplayName cannot be null for " + esRequest.getQuery());
 		}
 		return queryMetrics;
+	}
+
+	private String buildMetricDisplayName(Metric metric) {
+		if (metric.getMetricDisplayName() != null) {
+			return metric.getMetricDisplayName();
+		} else {
+			return metric.getJsonPathInResponse().replace(">", "|");
+		}
 	}
 
 	/**

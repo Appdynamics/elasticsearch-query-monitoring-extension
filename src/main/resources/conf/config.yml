@@ -12,9 +12,16 @@ metricPrefix: "Custom Metrics|Elastic Search|"
 
 
 # Elastic Search Queries: queryDisplayName and metricDisplayName are the names appended in AppD Metric Browser
-# index: is the Elastic Search index that the request is queried upon
+# index: is the Elastic Search index that the request is queried upon. This can be a single index or multiple indices separated by comma
 # query: the actual query enclosed in single quote OR with escape characters
-# jsonPathInResponse: the path to the datapoint in the JSON response separated by ">"
+# jsonPathInResponse: the xpath to the datapoint in the JSON response separated by ">"
+#   If the datapoint is with a JSON Array, specify the xpath in jsonPathInResponse till the JSON Array like in facets>terms>terms. 
+#   All the object values with in the array whose values are numbers would be reported to controller.
+# If metricDisplayName is not specified, the jsonPathInResponse is picked up as the displayName
+# Check for metric values in AppD Metric Browser at the following path
+#  Custom Metrics|Elastic Search|queryDisplayName|metricDisplayName 
+#       OR
+# Custom Metrics|Elastic Search|queryDisplayName|metricDisplayName|array_index|key (JSON Array)
 
 elasticSearchRequests:
    - queryDisplayName: my_river
@@ -23,8 +30,8 @@ elasticSearchRequests:
      metrics:
         - jsonPathInResponse: hits>total
           metricDisplayName: my_river_total
-        - jsonPathInResponse: facets>terms>terms
-          metricDisplayName: facets
+        - jsonPathInResponse: hits>hits
+        
    - queryDisplayName: index2
      index: index2
      query: '{ "query":{"match_all":{}}}'

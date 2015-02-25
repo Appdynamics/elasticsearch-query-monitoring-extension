@@ -160,6 +160,6 @@
         </repository>
     </repositories>
     <scm>
-        <connection>scm:git:https://github.com/Appdynamics/elasticsearch-monitoring-extension.git</connection>
+        <connection>scm:git:https://github.com/Appdynamics/elasticsearch-query-monitoring-extension.git</connection>
     </scm>
 </project>

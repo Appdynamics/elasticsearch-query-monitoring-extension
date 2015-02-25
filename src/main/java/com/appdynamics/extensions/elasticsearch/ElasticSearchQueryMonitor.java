@@ -48,7 +48,6 @@ import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException
 
 public class ElasticSearchQueryMonitor extends AManagedMonitor {
 
-	private static final String METRIC_SEPARATOR = "|";
 	private static final Logger logger = Logger.getLogger(ElasticSearchQueryMonitor.class);
 	public static final String CONFIG_ARG = "config-file";
 	private static final int DEFAULT_NUMBER_OF_THREADS = 5;
@@ -88,6 +87,7 @@ public class ElasticSearchQueryMonitor extends AManagedMonitor {
 				logger.info("Elastic Search Query Monitoring Task completed");
 				return new TaskOutput("Elastic Search Query Monitoring Task completed");
 			} catch (Exception e) {
+				e.printStackTrace();
 				logger.error("Metrics collection failed", e);
 			} finally {
 				if (threadPool != null && !threadPool.isShutdown()) {
@@ -140,8 +140,8 @@ public class ElasticSearchQueryMonitor extends AManagedMonitor {
 	private void printMetrics(Configuration config, List<QueryMetrics> metrics) {
 		String metricPrefix = config.getMetricPrefix();
 		for (QueryMetrics queryMetrics : metrics) {
-			Map<String, String> entry = queryMetrics.getMetrics();
-			for (Map.Entry<String, String> metric : entry.entrySet()) {
+			Map<String, Double> entry = queryMetrics.getMetrics();
+			for (Map.Entry<String, Double> metric : entry.entrySet()) {
 				StringBuilder metricPath = new StringBuilder();
 				metricPath.append(metricPrefix).append(metric.getKey());
 				printMetric(metricPath.toString(), metric.getValue());
@@ -149,17 +149,16 @@ public class ElasticSearchQueryMonitor extends AManagedMonitor {
 		}
 	}
 
-	private void printMetric(String metricPath, String metricValue) {
+	private void printMetric(String metricPath, Object metricValue) {
 		printMetric(metricPath, metricValue, MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION, MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE,
 				MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_INDIVIDUAL);
 	}
 
-	private void printMetric(String metricPath, String metricValue, String aggType, String timeRollupType, String clusterRollupType) {
+	private void printMetric(String metricPath, Object metricValue, String aggType, String timeRollupType, String clusterRollupType) {
 		MetricWriter metricWriter = getMetricWriter(metricPath, aggType, timeRollupType, clusterRollupType);
 		if (metricValue != null) {
 			if (logger.isDebugEnabled()) {
-				logger.debug("Sending [" + aggType + METRIC_SEPARATOR + timeRollupType + METRIC_SEPARATOR + clusterRollupType + "] metric = "
-						+ metricPath + " = " + metricValue);
+				logger.debug(metricPath + "    " + metricValue);
 				System.out.println(metricPath + "    " + metricValue);
 			}
 			metricWriter.printMetric(MetricUtils.toWholeNumberString(metricValue));

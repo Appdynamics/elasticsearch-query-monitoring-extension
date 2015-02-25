@@ -22,16 +22,16 @@ import com.google.common.collect.Maps;
 
 public class QueryMetrics {
 
-	private Map<String, String> metrics;
+	private Map<String, Double> metrics;
 
-	public Map<String, String> getMetrics() {
+	public Map<String, Double> getMetrics() {
 		if (metrics == null) {
 			metrics = Maps.newHashMap();
 		}
 		return metrics;
 	}
 
-	public void setMetrics(Map<String, String> metrics) {
+	public void setMetrics(Map<String, Double> metrics) {
 		this.metrics = metrics;
 	}
 
