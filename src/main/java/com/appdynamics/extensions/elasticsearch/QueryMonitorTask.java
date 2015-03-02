@@ -62,7 +62,6 @@ public class QueryMonitorTask implements Callable<QueryMetrics> {
 			processedMetrics = processResponeForMetrics(responseString, esRequest);
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("Exception while processing query " + esRequest.getQuery(), e);
 		}
 		return processedMetrics;
@@ -86,22 +85,29 @@ public class QueryMonitorTask implements Callable<QueryMetrics> {
 						String metricName = sb.toString();
 						queryMetrics.put(metricName, metricValue);
 					} else if (jsonNode.isArray()) {
-						int i = 0;
-						Iterator<JsonNode> elements = jsonNode.elements();
-						while (elements.hasNext()) {
-							JsonNode elementNode = elements.next();
-							Iterator<Entry<String, JsonNode>> fields = elementNode.fields();
-							while (fields.hasNext()) {
-								Entry<String, JsonNode> entry = fields.next();
-								if (entry.getValue().isNumber()) {
-									StringBuilder sb = new StringBuilder(queryName).append(METRIC_SEPARATOR).append(
-											buildMetricDisplayName(metric));
-									String metricName = sb.append(METRIC_SEPARATOR).toString() + i + METRIC_SEPARATOR + entry.getKey();
-									Double metricValue = entry.getValue().asDouble();
-									queryMetrics.put(metricName, metricValue);
+						//int i = 0;
+						if(metric.getArrayKey() != null & metric.getArrayValue() != null) {
+							Iterator<JsonNode> elements = jsonNode.elements();
+							while (elements.hasNext()) {
+								JsonNode elementNode = elements.next();
+								/*Iterator<Entry<String, JsonNode>> fields = elementNode.fields();
+								while (fields.hasNext()) {
+									Entry<String, JsonNode> entry = fields.next();
+									if (entry.getValue().isNumber()) {
+										StringBuilder sb = new StringBuilder(queryName).append(METRIC_SEPARATOR).append(
+												buildMetricDisplayName(metric));
+										String metricName = sb.append(METRIC_SEPARATOR).toString() + i + METRIC_SEPARATOR + entry.getKey();
+										Double metricValue = entry.getValue().asDouble();
+										queryMetrics.put(metricName, metricValue);
+									}
 								}
+								i++;*/
+								StringBuilder sb = new StringBuilder(queryName).append(METRIC_SEPARATOR).append(
+										buildMetricDisplayName(metric));
+								String metricName = sb.append(METRIC_SEPARATOR).toString() + elementNode.path(metric.getArrayKey());
+								Double metricValue = elementNode.path(metric.getArrayValue()).asDouble();
+								queryMetrics.put(metricName, metricValue);
 							}
-							i++;
 						}
 					}
 				}

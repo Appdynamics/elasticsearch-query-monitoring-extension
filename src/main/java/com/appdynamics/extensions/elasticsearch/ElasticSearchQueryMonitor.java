@@ -87,7 +87,6 @@ public class ElasticSearchQueryMonitor extends AManagedMonitor {
 				logger.info("Elastic Search Query Monitoring Task completed");
 				return new TaskOutput("Elastic Search Query Monitoring Task completed");
 			} catch (Exception e) {
-				e.printStackTrace();
 				logger.error("Metrics collection failed", e);
 			} finally {
 				if (threadPool != null && !threadPool.isShutdown()) {
@@ -159,7 +158,7 @@ public class ElasticSearchQueryMonitor extends AManagedMonitor {
 		if (metricValue != null) {
 			if (logger.isDebugEnabled()) {
 				logger.debug(metricPath + "    " + metricValue);
-				System.out.println(metricPath + "    " + metricValue);
+				//System.out.println(metricPath + "    " + metricValue);
 			}
 			metricWriter.printMetric(MetricUtils.toWholeNumberString(metricValue));
 		}

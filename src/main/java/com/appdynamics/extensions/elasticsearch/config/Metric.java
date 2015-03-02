@@ -19,6 +19,8 @@ package com.appdynamics.extensions.elasticsearch.config;
 public class Metric {
 	private String jsonPathInResponse;
 	private String metricDisplayName;
+	private String arrayKey;
+	private String arrayValue;
 
 	public String getJsonPathInResponse() {
 		return jsonPathInResponse;
@@ -34,6 +36,22 @@ public class Metric {
 
 	public void setMetricDisplayName(String metricDisplayName) {
 		this.metricDisplayName = metricDisplayName;
+	}
+
+	public String getArrayKey() {
+		return arrayKey;
+	}
+
+	public void setArrayKey(String arrayKey) {
+		this.arrayKey = arrayKey;
+	}
+
+	public String getArrayValue() {
+		return arrayValue;
+	}
+
+	public void setArrayValue(String arrayValue) {
+		this.arrayValue = arrayValue;
 	}
 
 }
