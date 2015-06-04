@@ -28,7 +28,7 @@ Below is the sample.
 	# number of concurrent tasks
 	numberOfThreads: 5
 
-	metricPrefix: "Custom Metrics|Elastic Search|"
+	metricPrefix: "Custom Metrics|ES Query|"
 
 
 	# Elastic Search Queries: queryDisplayName and metricDisplayName are the names appended in AppD Metric Browser
@@ -39,9 +39,9 @@ Below is the sample.
 	#   All the object values with in the array whose values are numbers would be reported to controller.
 	# If metricDisplayName is not specified, the jsonPathInResponse is picked up as the displayName
 	# Check for metric values in AppD Metric Browser at the following path
-	#  Custom Metrics|Elastic Search|queryDisplayName|metricDisplayName 
+	#  Custom Metrics|ES Query|queryDisplayName|metricDisplayName 
 	#       OR
-	# Custom Metrics|Elastic Search|queryDisplayName|metricDisplayName|array_index|key (JSON Array)
+	# Custom Metrics|ES Query|queryDisplayName|metricDisplayName|array_index|key (JSON Array)
 
 	# Example Query: ` curl -XPOST 'localhost:9200/_search?pretty' -d '{  "query": { "match_all": {} } }' `
 	# Example Response: `{
