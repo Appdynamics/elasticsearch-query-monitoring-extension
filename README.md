@@ -1,9 +1,11 @@
 # AppDynamics Elasticsearch Query Monitoring Extension
-This extension works only with the standalone machine agent.
 
 ##Use Case
 Elasticsearch is a distributed RESTful search server based on Lucene which provides a distributed multitenant-capable full text search engine.
-This extension fetches metrics by parsing the JSON response of the custom query executed on the Elastic Search engine and reports them to AppDynamics Metric Browser.
+
+This extension uses [ES Search API](https://www.elastic.co/guide/en/elasticsearch/reference/current/_the_search_api.html) to fetch metrics by parsing the JSON response of the custom query executed on the Elastic Search engine and reports them to AppDynamics Metric Browser.
+
+This extension works only with the standalone machine agent.
 
 ##Installation
 1. Run `mvn clean install` from the elasticsearch-query-monitoring-extension directory
@@ -15,17 +17,18 @@ In the AppDynamics Metric Browser, look for: Application Infrastructure Performa
 
 ##Configuration
 Note : Please make sure to not use tab (\t) while editing yaml files. You may want to validate the yaml file using a [yaml validator](http://yamllint.com/)
+
 1. Configure the ElasticSearch host, port and query parameters by editing the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ElasticSearchQueryMonitor/`.
 Below is the sample.
    ```
-    # Elastic Search particulars
+      # Elastic Search particulars
 	host: localhost
 	port: 9200
 	username: 
 	password: 
 	usessl: false
 
-	# number of concurrent tasks
+      # number of concurrent tasks
 	numberOfThreads: 5
 
 	metricPrefix: "Custom Metrics|ES Query|"
