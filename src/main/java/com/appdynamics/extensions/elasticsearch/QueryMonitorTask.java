@@ -132,6 +132,7 @@ public class QueryMonitorTask implements Callable<QueryMetrics> {
 	private String getJsonResponseString(SimpleHttpClient httpClient, String index, String data) throws Exception {
 		Response response = null;
 		try {
+			httpClient.setContentType("application/json");
 			response = httpClient.target().path(index).path(SEARCH_JSON_URI).post(data);
 			return response.string();
 		} catch (Exception e) {
