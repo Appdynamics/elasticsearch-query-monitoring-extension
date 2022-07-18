@@ -150,5 +150,3 @@ private String getJsonResponseString(SimpleHttpClient httpClient, String index, 
             }
         }
     }
-
-}
