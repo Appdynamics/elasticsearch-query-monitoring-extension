@@ -113,7 +113,7 @@ public class QueryMonitorTask implements Callable<QueryMetrics> {
       int thisMinutes = rsDate.getMinutes();
       if (thisHours > 7 || (thisHours == 7 && thisMinutes >= 30))
         index = index + "_" + sdf.format(rsDate); 
-      response = httpClient.target().path(index).path("_search?pretty").header("Content-Type", "application/json").post(data);
+      response = httpClient.target().path(index).path(SEARCH_JSON_URI).header("Content-Type","application/json").post(data);
       return response.string();
     } catch (Exception e) {
       throw e;
