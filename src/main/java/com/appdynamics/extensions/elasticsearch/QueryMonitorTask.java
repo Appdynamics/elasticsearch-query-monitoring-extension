@@ -16,13 +16,6 @@
 
 package com.appdynamics.extensions.elasticsearch;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.Callable;
-
-import org.apache.log4j.Logger;
 
 import com.appdynamics.extensions.elasticsearch.config.ElasticSearchRequest;
 import com.appdynamics.extensions.elasticsearch.config.Metric;
@@ -33,6 +26,13 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import org.apache.log4j.Logger;
 
 public class QueryMonitorTask implements Callable<QueryMetrics> {
 
