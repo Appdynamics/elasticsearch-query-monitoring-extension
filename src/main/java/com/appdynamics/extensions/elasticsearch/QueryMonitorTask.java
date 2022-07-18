@@ -38,7 +38,7 @@ public class QueryMonitorTask implements Callable<QueryMetrics> {
 
 	private SimpleHttpClient httpClient;
 	private ElasticSearchRequest esRequest;
-	private static final String SEARCH_JSON_URI = "_search?pretty";
+	private static final String SEARCH_JSON_URI = "_count?pretty";
 	private static final Logger logger = Logger.getLogger(QueryMonitorTask.class);
 	private static final String METRIC_SEPARATOR = "|";
 
@@ -132,8 +132,7 @@ public class QueryMonitorTask implements Callable<QueryMetrics> {
 	private String getJsonResponseString(SimpleHttpClient httpClient, String index, String data) throws Exception {
 		Response response = null;
 		try {
-			httpClient.setContentType("application/json");
-			response = httpClient.target().path(index).path(SEARCH_JSON_URI).post(data);
+			response = httpClient.target().path(index).path(SEARCH_JSON_URI).header("Content-Type","application/json").post(data);
 			return response.string();
 		} catch (Exception e) {
 			throw e;
