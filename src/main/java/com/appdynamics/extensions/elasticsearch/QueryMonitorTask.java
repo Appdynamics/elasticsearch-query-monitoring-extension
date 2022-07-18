@@ -129,24 +129,29 @@ public class QueryMonitorTask implements Callable<QueryMetrics> {
 	 * @return The JSON response string
 	 * @throws Exception
 	 */
-private String getJsonResponseString(SimpleHttpClient httpClient, String index, String data) throws Exception {
-        Response response = null;
-        try {
-            long myMilliseconds = System.currentTimeMillis();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-            Date rsDate = new Date(myMilliseconds);
-            int thisHours = rsDate.getHours();
-            int thisMinutes = rsDate.getMinutes();
-            if (thisHours > 7 || (thisHours == 7 && thisMinutes >= 30))
-                index += "_" + sdf.format(rsDate);
-            response = httpClient.target().path(index).path(SEARCH_JSON_URI).header("Content-Type","application/json").post(data);
-            //httpClient.target().path(index).path(SEARCH_JSON_URI).post(data);
-            return response.string();
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-        }
-    }
+  private String buildMetricDisplayName(Metric metric) {
+    if (metric.getMetricDisplayName() != null)
+      return metric.getMetricDisplayName(); 
+    return metric.getJsonPathInResponse().replace(">", "|");
+  }
+  
+  private String getJsonResponseString(SimpleHttpClient httpClient, String index, String data) throws Exception {
+    Response response = null;
+    try {
+      long myMilliseconds = System.currentTimeMillis();
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+      Date rsDate = new Date(myMilliseconds);
+      int thisHours = rsDate.getHours();
+      int thisMinutes = rsDate.getMinutes();
+      if (thisHours > 7 || (thisHours == 7 && thisMinutes >= 30))
+        index = index + "_" + sdf.format(rsDate); 
+      response = httpClient.target().path(index).path("_search?pretty").header("Content-Type", "application/json").post(data);
+      return response.string();
+    } catch (Exception e) {
+      throw e;
+    } finally {
+      if (response != null)
+        response.close(); 
+    } 
+  }
+}
